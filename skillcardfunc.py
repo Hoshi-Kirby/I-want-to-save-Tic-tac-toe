@@ -180,6 +180,12 @@ def riset(card_select_before):
     value.card_dx=[[0]*10,[0]*10]
     value.card_dy=[[0]*10,[0]*10]
 
+def bridgech(x,y,n):
+    if value.board2[x][y]==15-n:
+        value.board2[x][y]=9
+    else:
+        value.board2[x][y]=n
+
 
 
 
@@ -735,15 +741,15 @@ def skill43():
         value.bridge_direct[click_x][click_y]=value.bridge_direct_n
         value.board[click_x][click_y]=4+value.player
         if value.bridge_direct[click_x][click_y]==0 and value.player==1 or value.bridge_direct[click_x][click_y]==1 and value.player==2:
-            if click_y>1:value.board2[2+(click_x-2)*2][2+(click_y-2)*2-1]=7
-            if click_y<3:value.board2[2+(click_x-2)*2][2+(click_y-2)*2+1]=7
-            if click_x>1:value.board2[2+(click_x-2)*2-1][2+(click_y-2)*2]=8
-            if click_x<3:value.board2[2+(click_x-2)*2+1][2+(click_y-2)*2]=8
+            if click_y>1:bridgech(2+(click_x-2)*2,2+(click_y-2)*2-1,7)
+            if click_y<3:bridgech(2+(click_x-2)*2,2+(click_y-2)*2+1,7)
+            if click_x>1:bridgech(2+(click_x-2)*2-1,2+(click_y-2)*2,8)
+            if click_x<3:bridgech(2+(click_x-2)*2+1,2+(click_y-2)*2,8)
         else:
-            if click_y>1:value.board2[2+(click_x-2)*2][2+(click_y-2)*2-1]=8
-            if click_y<3:value.board2[2+(click_x-2)*2][2+(click_y-2)*2+1]=8
-            if click_x>1:value.board2[2+(click_x-2)*2-1][2+(click_y-2)*2]=7
-            if click_x<3:value.board2[2+(click_x-2)*2+1][2+(click_y-2)*2]=7
+            if click_y>1:bridgech(2+(click_x-2)*2,2+(click_y-2)*2-1,8)
+            if click_y<3:bridgech(2+(click_x-2)*2,2+(click_y-2)*2+1,8)
+            if click_x>1:bridgech(2+(click_x-2)*2-1,2+(click_y-2)*2,7)
+            if click_x<3:bridgech(2+(click_x-2)*2+1,2+(click_y-2)*2,7)
         value.skillstep=0
         value.gamestep=1
         soundplay.se_play(20)
