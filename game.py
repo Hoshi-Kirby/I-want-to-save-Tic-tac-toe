@@ -250,7 +250,7 @@ hand_max=9
 
 #コスト
 cost_image=[]
-for i in range(11):
+for i in range(17):
     cost_image.append(pygame.image.load(f"image/cost{i}.png").convert())
     cost_image[i].set_colorkey((255, 255, 255))
     cost_image[i]=pygame.transform.scale_by(cost_image[i],card_size)
@@ -652,11 +652,12 @@ def gameb():
     if value.fade_in:
         if not menu:
             value.fade_alpha -= 20  # フェード速度（調整可）
+        if value.fade_alpha==215:
+            soundplay.se_play(8)
         if value.fade_alpha <= 0:
             value.fade_alpha = 0
 
             value.fade_in = False
-            soundplay.se_play(8)
 
         value.fade_surface.set_alpha(value.fade_alpha)
         value.screen.blit(value.fade_surface, (0, 0))
