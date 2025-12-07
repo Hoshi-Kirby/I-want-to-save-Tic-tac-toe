@@ -14,6 +14,7 @@ arrow_collide_first_x=0
 arrow_collide_first_y=0
 hold_t=0
 all_arrow_collide_ch=0
+quickmenu=-1
 
 #壁紙
 pekin2 = pygame.image.load("image/neon_city3.png").convert()
@@ -347,6 +348,7 @@ def menu():
     global arrow_push2
     global collide_first
     global get_pos
+    global quickmenu
 
     get_pos=pygame.mouse.get_pos()
     #壁紙
@@ -461,6 +463,16 @@ def menu():
                             value.play_number=i
                             soundplay.se_play(0)
 
+    match(quickmenu):
+        case (0 | 1 | 2 | 3):
+            if moveto1==0:
+                value.menustep=1
+                moveto2=move_time
+                value.play_number=quickmenu
+                quickmenu=-1
+                soundplay.se_play(0)
+        case -1:
+            pass
 
                             
                     
@@ -516,6 +528,7 @@ def menu2():
     global mouse_check_change_deck_time
     global mouse_check_change_deck
     global get_pos
+    global quickmenu
     get_pos=pygame.mouse.get_pos()
     #壁紙
     value.screen.blit(pekin2, (widhe_skew2,0))
@@ -719,10 +732,17 @@ def menu2():
                         deck_change2=False
                 else:
                     for i in range(tab+1):
-                        if frame_rect[4].collidepoint(get_pos):
-                            value.menustep=0
-                            moveto1=move_time-moveto2
-                            soundplay.se_play(3)
+                        if frame_rect[i].collidepoint(pygame.mouse.get_pos()):
+                            match(i):
+                                case 4:
+                                    value.menustep=0
+                                    moveto1=move_time-moveto2
+                                    soundplay.se_play(3)
+                                case (0 | 1 | 2 | 3):
+                                    if i!=value.play_number and moveto1==0 and moveto2==0:
+                                        moveto1=move_time-moveto2
+                                        value.menustep=0
+                                        quickmenu=i
                     if arrow_rect1[0].collidepoint(get_pos):
                         arrow_push1[0]=5
                         if value.Startinghandsize>0:value.Startinghandsize-=1
@@ -759,10 +779,18 @@ def menu2():
                         soundplay.se_play(4)
             elif value.play_number==2:
                 for i in range(tab+1):
-                    if frame_rect[4].collidepoint(get_pos):
-                        value.menustep=0
-                        moveto1=move_time-moveto2
-                        soundplay.se_play(3)
+                    if frame_rect[i].collidepoint(pygame.mouse.get_pos()):
+                        match(i):
+                            case 4:
+                                value.menustep=0
+                                moveto1=move_time-moveto2
+                                soundplay.se_play(3)
+                                quickmenu=-1
+                            case (0 | 1 | 2 | 3):
+                                if i!=value.play_number and moveto1==0 and moveto2==0:
+                                    moveto1=move_time-moveto2
+                                    value.menustep=0
+                                    quickmenu=i
                 if arrow_rect1[2].collidepoint(get_pos):
                     arrow_push1[0]=5
                     if value.help_page>0:value.help_page-=1
@@ -774,10 +802,18 @@ def menu2():
 
             elif value.play_number==3:
                 for i in range(tab+1):
-                    if frame_rect[4].collidepoint(get_pos):
-                        value.menustep=0
-                        moveto1=move_time-moveto2
-                        soundplay.se_play(3)
+                    if frame_rect[i].collidepoint(pygame.mouse.get_pos()):
+                        match(i):
+                            case 4:
+                                value.menustep=0
+                                moveto1=move_time-moveto2
+                                soundplay.se_play(3)
+                                quickmenu=-1
+                            case (0 | 1 | 2 | 3):
+                                if i!=value.play_number and moveto1==0 and moveto2==0:
+                                    moveto1=move_time-moveto2
+                                    value.menustep=0
+                                    quickmenu=i
                 for i in range(4):
                         if make_deck_rect[i].collidepoint(get_pos):
                             value.make_deck_ka=i
