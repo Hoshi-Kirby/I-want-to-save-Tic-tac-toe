@@ -1353,7 +1353,7 @@ def skillbase():
         card_rect = all_cards_image[11].get_rect(topleft=(cardx + j * value.spacing, cardy))
         y = cardy
         y+=value.card_dy[0][j]
-        if card_select_any==j:
+        if card_select_any==j and value.skillstep==0:
             y-=30
         elif value.card_select_base[0]==j and value.card_dy_mode:
             y-=10
@@ -1381,7 +1381,7 @@ def skillbase():
         card_rect = all_cards_image[11].get_rect(topleft=(cardx2 + j * value.spacing2, cardy2))
         y = cardy2
         y-=value.card_dy[1][j]
-        if card_select_any==j:
+        if card_select_any==j and value.skillstep==0:
             y+=30
         elif value.card_select_base[1]==j and value.card_dy_mode:
             y+=10
