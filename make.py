@@ -20,12 +20,25 @@ def on_click_copy_button(code):
         await write_clipboard(code)
     asyncio.create_task(_run())
 
-def on_click_paste_button():
-    async def _run():
-        global code_paste
-        text = await read_clipboard()
-        code_paste=text
-    asyncio.create_task(_run())
+async def on_click_paste_button():
+    global code_paste, maked_deck, code_paste_text, can_not_make_time
+
+    maked_deck = {}
+    try:
+        # 0.2秒以内に返ってこなければ空文字扱いにする
+        code_paste = await asyncio.wait_for(read_clipboard(), timeout=0.2)
+    except:
+        code_paste = ""
+
+    maked_deck = make_deck(code_paste)
+
+    if len(maked_deck) != 0:
+        code_paste_text = font2.render(code_paste, True, (255, 255, 255))
+        soundplay.se_play(4)
+    else:
+        code_paste = ""
+        can_not_make_time = 30
+        soundplay.se_play(25)
 
 t=-1
 collide=0
@@ -602,17 +615,7 @@ def make():
                         on_click_copy_button(code_code)
                         copydone_time=30
                 elif makebutton_rect.collidepoint(pygame.mouse.get_pos()):
-                    maked_deck={}
-                    on_click_paste_button()
-
-                    maked_deck=make_deck(code_paste)
-                    if len(maked_deck)!=0:
-                        code_paste_text = font2.render(code_paste, True, (255, 255, 255))
-                        soundplay.se_play(4)
-                    else:
-                        code_paste=""
-                        can_not_make_time=30
-                        soundplay.se_play(25)
+                    asyncio.create_task(on_click_paste_button())
                 elif maked_rect.collidepoint(pygame.mouse.get_pos()) and code_paste!="":
                     value.deck[value.make_deck_ka]=[]
                     for skill in skill_list:
