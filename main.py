@@ -14,6 +14,7 @@ async def main():
     pygame.init()
     value.player = 1
     value.game_over = False
+    make.hide_textbox()
     while True:
         if value.step==0:
             soundplay.bgm_play(1)

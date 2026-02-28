@@ -4,13 +4,10 @@ import math
 import sqlite3
 import js
 import asyncio
+import platform
 
 import value
 import soundplay
-
-async def read_clipboard():
-    text = await js.navigator.clipboard.readText()
-    return str(text)
 
 async def write_clipboard(text: str):
     await js.navigator.clipboard.writeText(text)
@@ -19,26 +16,6 @@ def on_click_copy_button(code):
     async def _run():
         await write_clipboard(code)
     asyncio.create_task(_run())
-
-async def on_click_paste_button():
-    global code_paste, maked_deck, code_paste_text, can_not_make_time
-
-    maked_deck = {}
-    try:
-        # 0.2秒以内に返ってこなければ空文字扱いにする
-        code_paste = await asyncio.wait_for(read_clipboard(), timeout=0.2)
-    except:
-        code_paste = ""
-
-    maked_deck = make_deck(code_paste)
-
-    if len(maked_deck) != 0:
-        code_paste_text = font2.render(code_paste, True, (255, 255, 255))
-        soundplay.se_play(4)
-    else:
-        code_paste = ""
-        can_not_make_time = 30
-        soundplay.se_play(25)
 
 t=-1
 collide=0
@@ -125,6 +102,61 @@ maked2 = pygame.image.load("image/make_make2.png").convert()
 maked2 = pygame.transform.scale_by(maked2,makedsize)
 makedx,makedy=frame7x+550,frame7y+220
 maked_rect=maked.get_rect(topleft=(makedx,makedy))
+
+# platform.window.eval("""
+# let canvas = document.querySelector("canvas");
+# let rect = canvas.getBoundingClientRect();
+
+# let input = document.createElement("input");
+# input.id = "py_input";
+# input.type = "text";
+# input.inputMode = "latin";
+
+# input.style.position = "absolute";
+# input.style.left = rect.left + rect.width/2 - 100 + "px";
+# input.style.top = rect.top + rect.height/2 - 20 + "px";
+
+# input.style.width = "200px";
+# input.style.zIndex = 9999;
+
+# document.body.appendChild(input);
+# """)
+platform.window.eval("""
+let old = document.getElementById("py_input");
+if (old) old.remove();
+
+let input = document.createElement("input");
+input.id = "py_input";
+input.type = "text";
+
+input.style.position = "absolute";
+input.style.zIndex = 9999;
+
+input.addEventListener("keydown", e => e.stopPropagation());
+input.addEventListener("keyup", e => e.stopPropagation());
+input.addEventListener("keypress", e => e.stopPropagation());
+
+document.body.appendChild(input);
+input.focus();
+""")
+
+def show_textbox():
+    platform.window.eval("""
+    let input = document.getElementById("py_input");
+    if (input) {
+        input.style.display = "block";
+        input.focus();
+    }
+    """)
+
+def hide_textbox():
+    platform.window.eval("""
+    let input = document.getElementById("py_input");
+    if (input) {
+        input.style.display = "none";
+    }
+    """)
+isPaste=False
 
 #結果
 black_sq_size=2
@@ -289,7 +321,7 @@ font2 =pygame.font.Font("fonts/NotoSansJP-VariableFont_wght.ttf", 25)
 back_text = font.render("戻る", True, (255, 255, 255))
 flont_text = font.render("保存", True, (255, 255, 255))
 code_text = font2.render("デッキコード", True, (255, 255, 255))
-can_not_make_text = font2.render("クリップボードに正しいコードを入れてください", True, (255, 255, 255))
+can_not_make_text = font2.render("テキストボックスに正しいコードを入れてください", True, (255, 255, 255))
 
 def detail(x,xx,yy):
     value.detail_check=True
@@ -381,6 +413,7 @@ def make():
     global code_paste_text
     global f7on
     global f7off
+    global isPaste
 
 
     if value.t<8:
@@ -537,6 +570,7 @@ def make():
         value.screen.blit(frame7_2, (frame7x,frame7y+f7h/2*(n-scale)/n))
         if f7on==1:
             deckcode_step=2
+            show_textbox()
         if f7off==1:
             deckcode_step=0
             
@@ -563,7 +597,12 @@ def make():
             value.screen.blit(maked, (makedx,makedy))
 
         if can_not_make_time>0:
-            value.screen.blit(can_not_make_text,(makex-60,makey+50))
+            value.screen.blit(can_not_make_text,(makex-65,makey+50))
+
+        text = platform.window.eval(
+            "document.getElementById('py_input').value"
+        )
+
 
     #event
     for event in pygame.event.get():
@@ -615,7 +654,8 @@ def make():
                         on_click_copy_button(code_code)
                         copydone_time=30
                 elif makebutton_rect.collidepoint(pygame.mouse.get_pos()):
-                    asyncio.create_task(on_click_paste_button())
+                    isPaste=True
+                    code_paste=text
                 elif maked_rect.collidepoint(pygame.mouse.get_pos()) and code_paste!="":
                     value.deck[value.make_deck_ka]=[]
                     for skill in skill_list:
@@ -623,17 +663,30 @@ def make():
                             value.deck[value.make_deck_ka].append(skill)
                     code_paste=""
                     f7off=n
+                    hide_textbox()
                     deckcode_step=1
                     soundplay.se_play(24)
                 elif close_rect.collidepoint(pygame.mouse.get_pos()):
                     code_paste=""
                     f7off=n
+                    hide_textbox()
                     deckcode_step=1
                     soundplay.se_play(4)
 
 
 
-    
+    if isPaste:
+        maked_deck={}
+        maked_deck=make_deck(code_paste)
+        if len(maked_deck)!=0:
+            code_paste_text = font2.render(code_paste, True, (255, 255, 255))
+            soundplay.se_play(4)
+        else:
+            code_paste=""
+            can_not_make_time=30
+            soundplay.se_play(25)
+        isPaste=False
+
 
 
 

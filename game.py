@@ -1322,7 +1322,7 @@ def change():
     if menumode==False and cardx_move>0:cardx_move-=1
     if menumode==False and cardx_move2>0:cardx_move2-=1
     if menumode==False:value.t+=1
-    value.t+=1
+    menut+=1
     
     
 
@@ -1568,6 +1568,5 @@ def skillbase():
         value.screen.blit(value.fade_surface, (0, 0))
 
     value.t+=1
-    if menumode==False and value.cput>0:value.cput-=1
     menut+=1
     
