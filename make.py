@@ -278,6 +278,9 @@ for i in (11,12,13,21,22,23,24,25,31,32,33,41,42,43,44,45):
             color = all_cards_bar[i].get_at((x, y))
             if color.r == 255 and color.g == 255 and color.b == 255:
                 all_cards_bar[i].set_at((x, y), (255, 255, 255, 0))  # 白を透明に
+    all_cards_bar[i+50]=pygame.image.load(f"image/card_{i // 10}-{i % 10}ex.png").convert_alpha()
+    all_cards_bar[i+50]=pygame.transform.scale_by(all_cards_bar[i+50],card_size)
+    all_cards_bar[i+50].set_colorkey((255, 255, 255))
 
 
 
@@ -426,16 +429,25 @@ def make():
     value.screen.blit(black_sq, (black_sqx,black_sqy-x2))
 
     collide=-1
+    now_skillnum=0
+    skillnum_num=0
     for i in range(len(value.deck[value.make_deck_ka])):
         card_bar_rect=all_cards_bar[11].get_rect(topleft=(card_bar_x,card_bar_y+card_bar_distance*i))
+        if now_skillnum==value.deck[value.make_deck_ka][i]:
+            skillnum_num+=1
+            if skillnum_num>3:limit50=50
+        else:
+            now_skillnum=value.deck[value.make_deck_ka][i]
+            skillnum_num=0
+            limit50=0
         if card_bar_rect.collidepoint(pygame.mouse.get_pos()) and collide==-1 and deckcode_step==0:
             collide=i
             detail(value.deck[value.make_deck_ka][i],detailx,detaily)
-            value.screen.blit(all_cards_bar[value.deck[value.make_deck_ka][i]], (card_bar_x-10,card_bar_y+card_bar_distance*i-x2))
+            value.screen.blit(all_cards_bar[value.deck[value.make_deck_ka][i]+limit50], (card_bar_x-10,card_bar_y+card_bar_distance*i-x2))
             value.screen.blit(cost_image[value.cost[value.deck[value.make_deck_ka][i]]], (card_bar_x+2,card_bar_y+card_bar_distance*i-x2))
             se_collide(2,i)
         else:
-            value.screen.blit(all_cards_bar[value.deck[value.make_deck_ka][i]], (card_bar_x,card_bar_y+card_bar_distance*i-x2))
+            value.screen.blit(all_cards_bar[value.deck[value.make_deck_ka][i]+limit50], (card_bar_x,card_bar_y+card_bar_distance*i-x2))
             value.screen.blit(cost_image[value.cost[value.deck[value.make_deck_ka][i]]], (card_bar_x+12,card_bar_y+card_bar_distance*i-x2))
             collide_first[i]=1
 
@@ -657,15 +669,20 @@ def make():
                     isPaste=True
                     code_paste=text
                 elif maked_rect.collidepoint(pygame.mouse.get_pos()) and code_paste!="":
-                    value.deck[value.make_deck_ka]=[]
-                    for skill in skill_list:
-                        for i in range(maked_deck[skill]):
-                            value.deck[value.make_deck_ka].append(skill)
+                    if len(code_paste) == 5 and code_paste.startswith("add") and code_paste[3:5] in {"11","12","13","21","22","23","24","25","31","32","33","41","42","43","44","45"}:
+                        if len(value.deck[value.make_deck_ka])<20:
+                            value.deck[value.make_deck_ka].append(int(code_paste[3:5]))
+                        soundplay.se_play(26)
+                    else:
+                        value.deck[value.make_deck_ka]=[]
+                        for skill in skill_list:
+                            for i in range(maked_deck[skill]):
+                                value.deck[value.make_deck_ka].append(skill)
+                        soundplay.se_play(24)
                     code_paste=""
                     f7off=n
                     hide_textbox()
                     deckcode_step=1
-                    soundplay.se_play(24)
                 elif close_rect.collidepoint(pygame.mouse.get_pos()):
                     code_paste=""
                     f7off=n
@@ -678,7 +695,7 @@ def make():
     if isPaste:
         maked_deck={}
         maked_deck=make_deck(code_paste)
-        if len(maked_deck)!=0:
+        if len(maked_deck)!=0 or (len(code_paste) == 5 and code_paste.startswith("add") and code_paste[3:5] in {"11","12","13","21","22","23","24","25","31","32","33","41","42","43","44","45"}):
             code_paste_text = font2.render(code_paste, True, (255, 255, 255))
             soundplay.se_play(4)
         else:

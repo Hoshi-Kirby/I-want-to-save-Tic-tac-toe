@@ -115,3 +115,7 @@ hold_color=0
 
 #BGM
 bgm_track=0
+
+#git subtree split --prefix build/web main -b gh-pages-temp
+#git push origin gh-pages-temp:gh-pages --force
+#git branch -D gh-pages-temp
